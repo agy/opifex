@@ -22,7 +22,12 @@ Opifex = (Url,Modules...) ->
 			$["*"].apply $, [method].concat(args)
 		else
 			$[method]?.apply $, args
-	Modules?.map (x) -> (require "opifex.#{x}").apply(self,[])
+	Modules?.map (x) -> 
+		if typeof(x) == 'function'
+			x.apply(self,[])
+		else
+			(require "opifex.#{x}").apply(self,[])
+			
 	self.exchanges = {}
 	self.connection = amqp.createConnection
 		host: host,
