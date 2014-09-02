@@ -4,7 +4,7 @@
 #
 amqp = require 'wot-amqp'
 
-Opifex = (Url,Module,Args) ->
+Opifex = (Url,Module,Args...) ->
 	[ proto, user, password, host, port, domain, exchange, key, queue, dest, path ] = unescape(Url).match(
 		///([^:]+)://([^:]+):([^@]+)@([^:]+):(\d+)/([^\/]*)/([^\/]+)/([^\/]+)/([^\/]*)/*([^\/]*)/*([^\/]*)///
 	)[1...]
