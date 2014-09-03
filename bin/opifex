@@ -3,7 +3,7 @@
 
 Opifex = require 'opifex'
 [ amqp, module, args... ] = process.argv[2...]
-amqp ||= process.env['amqp']
-module ||= process.env['module']
-args ||= (process.env['args'] || "").split(///\s+///) 
+amqp ||= process.env['AMQP']
+module ||= process.env['MODULE']
+args ||= (process.env['ARGS'] || "").split(///\s+///) 
 Opifex.apply(Opifex,[ amqp, module, args ])
