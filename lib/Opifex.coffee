@@ -12,7 +12,11 @@ Opifex = (Url,Module,Args...) ->
 	path ||= key # for publish only, NB: you can not send to # or * routes
 	self = (message, headers, info)  ->
 		$ = arguments.callee
-		[ method, args... ] = JSON.parse message.data.toString()
+		try 
+			[ method, args... ] = JSON.parse message.data.toString()
+		catch e
+			console.log "not json #{message.data}"
+			return
 		$.key = info.routingKey
 		$.exchange = info.exchange
 		$.queue = info.queue
