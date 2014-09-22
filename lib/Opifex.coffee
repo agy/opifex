@@ -3,6 +3,7 @@
 #	© 2013 Dave Goehrig <dave@dloh.org>
 #
 amqp = require 'wot-amqp'
+request = require 'request'
 
 Opifex = (Url,Module,Args...) ->
 	[ proto, user, password, host, port, domain, exchange, key, queue, dest, path ] = unescape(Url).match(
@@ -46,6 +47,18 @@ Opifex = (Url,Module,Args...) ->
 	self.connection.on 'ready', () ->
 		self.connection.exchange exchange, { durable: false, type: 'topic', autoDelete: true }, (Exchange) ->
 			self.exchange = Exchange
+			# The management/monitoring exchange must remain auto-delete, but the federation from wot/monitoring becomes unbound when the exchange dies.
+			# If this endpoint is connected to the management vhost we need to make sure that the federation gets re-bound as well.
+			if domain == 'management' && exchange == 'monitoring'
+				reqOpts =
+					url: "http://#{user}:#{password}@#{host}:15672/api/bindings/#{domain}/e/#{exchange}/q/#{exchange}"
+					method: 'POST'
+					json: '{"routing_key":"#","arguments":[]}'
+				request.get reqOpts, (error,response,body) ->
+					if !error
+						console.log "Failed to bind monitoring federation. Please check RabbitMQ management console."
+					else
+						console.log "Created monitoring federation."
 		self.connection.queue queue,{ arguments: { "x-message-ttl" : 60000 } }, (Queue) ->
 			self.queue = Queue
 			self.queue.bind exchange, key
