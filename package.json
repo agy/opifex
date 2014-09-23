@@ -3,7 +3,7 @@
   "name": "opifex",
   "license": "MIT",
   "description": "A general purpose AMQP laborer",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "repository": {
     "url": "http://github.com/WoTio/opifex"
   },
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "wot-amqp": ">=0.2.0",
-	"request": ">=2.44.0"
+    "request": ">=2.44.0"
   },
   "devDependencies": {},
   "optionalDependencies": {},
