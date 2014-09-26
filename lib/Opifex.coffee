@@ -16,12 +16,19 @@ Opifex = (Url,Module,Args...) ->
 			[ method, args... ] = JSON.parse message.data.toString()
 		catch e
 			console.log "not json #{message.data}"
+			# attempt to pass the data to a wildcard handler so we can interpret
+			$["*"].apply $, [ message.data ]
 			return
 		$.key = info.routingKey
 		$.exchange = info.exchange
 		$.queue = info.queue
 		$.dest = dest
 		$.path = path
+		# if there is no method at all, attempt the wildcard handler on the message data
+		if not method and $["*"]
+			# NB: we will have a json object or we would have caught above!!!
+			$["*"].apply $, [ JSON.parse(message.data) ]
+			return
 		if not $[method] and $["*"]
 			$["*"].apply $, [method].concat(args)
 		else
