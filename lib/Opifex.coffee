@@ -46,11 +46,11 @@ Opifex = (Url,Module,Args...) ->
 	self.connection.on 'ready', () ->
 		self.connection.exchange exchange, { durable: false, type: 'topic', autoDelete: true }, (Exchange) ->
 			self.exchange = Exchange
-		self.connection.queue queue,{ arguments: { "x-message-ttl" : 60000 } }, (Queue) ->
-			self.queue = Queue
-			self.queue.bind exchange, key
-			self.queue.subscribe self
-			self['init']?.apply(self,[])
+			self.connection.queue queue,{ arguments: { "x-message-ttl" : 60000 } }, (Queue) ->
+				self.queue = Queue
+				self.queue.bind exchange, key
+				(self.queue.subscribe self).addCallback (ok) ->
+					self['init']?.apply(self,[])
 	self.send = (msg,route,recipient) -># route & recipient are optional, default to destination exchange and key respectively
 		route ?= dest
 		recipient ?= path
