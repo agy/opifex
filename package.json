@@ -3,7 +3,7 @@
   "name": "opifex",
   "license": "MIT",
   "description": "A general purpose AMQP laborer",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "repository": {
     "url": "http://github.com/WoTio/opifex"
   },
