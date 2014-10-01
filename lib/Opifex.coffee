@@ -17,7 +17,7 @@ Opifex = (Url,Module,Args...) ->
 		catch e
 			console.log "not json #{message.data}"
 			# attempt to pass the data to a wildcard handler so we can interpret
-			$["*"].apply $, [ message.data ]
+			$["*"].apply $, [ message.data ] if message.data?
 			return
 		$.key = info.routingKey
 		$.exchange = info.exchange
