@@ -61,6 +61,7 @@ Opifex = (Url,Module,Args...) ->
 	self.send = (msg,route,recipient) -># route & recipient are optional, default to destination exchange and key respectively
 		route ?= dest
 		recipient ?= path
+		if !msg then return
 		if typeof msg != "string"
 			msg = JSON.stringify msg
 		if self[route]
