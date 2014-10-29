@@ -19,6 +19,8 @@ Opifex = (Url,Module,Args...) ->
 			# attempt to pass the data to a wildcard handler so we can interpret
 			$["*"].apply $, [ message.data ] if message.data?
 			return
+		console.log "got headers #{JSON.stringify headers}"
+		$.headers = headers
 		$.key = info.routingKey
 		$.exchange = info.exchange
 		$.queue = info.queue
@@ -65,11 +67,13 @@ Opifex = (Url,Module,Args...) ->
 		if typeof msg != "string"
 			msg = JSON.stringify msg
 		if self[route]
-			self[route].publish(recipient,msg)
+			console.log "Publishing with #{ JSON.stringify self.headers }"
+			self[route].publish(recipient,msg, { headers: self.headers })
 		else
 			self.connection.exchange route, { durable: false, type: 'topic', autoDelete: true }, (Exchange) ->
 				self[route] = Exchange
-				Exchange?.publish(recipient,msg)
+				console.log "Publishing with #{ JSON.stringify self.headers }"
+				Exchange?.publish(recipient,msg, { headers: self.headers })
 	self
 
 module.exports = Opifex
