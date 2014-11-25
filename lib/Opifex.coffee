@@ -20,6 +20,7 @@ Opifex = (Url,Module,Args...) ->
 			$["*"].apply $, [ message.data ] if message.data?
 			return
 		console.log "got headers #{JSON.stringify headers}"
+		$.account = domain
 		$.headers = headers
 		$.key = info.routingKey
 		$.exchange = info.exchange
