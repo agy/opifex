@@ -47,7 +47,8 @@ Opifex = (Url,Module,Args...) ->
 		port: port*1,
 		login: user,
 		password: password,
-		vhost: domain || '/'
+		vhost: domain || '/',
+		heartbeat: 10
 	self.connection.on 'error', (Message) ->
 		console.log "Connection error", Message
 	self.connection.on 'end', () ->
