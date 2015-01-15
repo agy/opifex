@@ -72,11 +72,11 @@ Opifex = (Url,Module,Args...) ->
 
 		self.connection.on 'error', (Message) ->
 			console.log "[opifex] connection error", Message
-		#	self.connect()
+			process.exit 1
 
 		self.connection.on 'end', () ->
 			console.log "[opifex] connection closed"
-		#	self.connect()
+			process.exit 0
 
 		self.connection.on 'ready', () ->
 			# create exchange if necesssary
