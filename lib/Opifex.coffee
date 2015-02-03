@@ -69,16 +69,12 @@ Opifex = (Url,Module,Args...) ->
 			msg = JSON.stringify msg
 		if self[route]
 			console.log "Publishing with #{ JSON.stringify self.headers }"
-			options = {}
-			options.header = self.header if self.header
-			self[route].publish(recipient,msg,options)
+			self[route].publish(recipient,msg, { headers: self.headers || {} })
 		else
 			self.connection.exchange route, { durable: false, type: 'topic', autoDelete: true }, (Exchange) ->
 				self[route] = Exchange
 				console.log "Publishing with #{ JSON.stringify self.headers }"
-				options = {}
-				options.header = self.header if self.header
-				Exchange?.publish(recipient,msg,options)
+				Exchange?.publish(recipient,msg,{ headers: self.headers || {} })
 	self
 
 module.exports = Opifex
