@@ -15,9 +15,9 @@ Opifex = (Url,Module,Args...) ->
 		try 
 			[ method, args... ] = JSON.parse message.data.toString()
 		catch e
-			console.log "not json #{message.data}"
+			console.log "not json or unexpected format, passing to wildcard: #{JSON.stringify message}"
 			# attempt to pass the data to a wildcard handler so we can interpret
-			$["*"].apply $, [ message.data ] if message.data?
+			$["*"].apply $, [ message ]
 			return
 		console.log "got headers #{JSON.stringify headers}"
 		$.headers = headers
