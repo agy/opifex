@@ -73,6 +73,10 @@ Opifex = (Url,Module,Args...) ->
 		self.connection.on 'error', (Message) ->
 			console.log "[opifex] connection error", Message
 			process.exit 1
+		
+		self.connection.on 'close', () ->
+			console.log "[opifex] connection closed"
+			process.exit 0
 
 		self.connection.on 'end', () ->
 			console.log "[opifex] connection closed"
