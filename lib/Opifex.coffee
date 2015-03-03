@@ -97,7 +97,7 @@ Opifex = (Url,Module,Args...) ->
 
 	# sends a message to the given exchange and metadata
 	# route & meta are optional, default to destination exchange and key respectively
-	self.send = (msg,route,meta) -> 
+	self.send = (msg,route,meta,headers) -> 
 		route ?= dest
 		meta ?= path
 		if !msg then return
@@ -110,7 +110,7 @@ Opifex = (Url,Module,Args...) ->
 		else	# otherwise establish the route and try again
 			self.connection?.exchange route, { durable: false, type: 'topic', autoDelete: true }, (Exchange) ->
 				self[route] = Exchange
-				self.send(msg,route,meta)
+				self.send(msg,route,meta,headers)
 
 	# attempt our initial connection	
 	self.connect()
