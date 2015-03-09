@@ -12,7 +12,7 @@
     "opifex": "./bin/opifex"
   },
   "dependencies": {
-    "wot-amqp": ">=0.2.0"
+    "wot-amqp": "0.2.1"
   },
   "devDependencies": {},
   "optionalDependencies": {},
