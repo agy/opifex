@@ -65,8 +65,6 @@ Opifex = (Url,Module,Args...) ->
 		route ?= dest
 		recipient ?= path
 		if !msg then return
-		if typeof msg != "string"
-			msg = JSON.stringify msg
 		if self[route]
 			self[route].publish(recipient,msg, { headers: self.headers || {} })
 		else
