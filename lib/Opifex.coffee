@@ -51,6 +51,8 @@ Opifex = (Url,Module,Args...) ->
 		heartbeat: 10
 	self.connection.on 'error', (Message) ->
 		console.log "Connection error", Message
+	self.connection.on 'close', () ->
+		console.log "[OPIFEX] GOT CONNECTION CLOSE"
 	self.connection.on 'end', () ->
 		console.log "Connection closed"
 	self.connection.on 'ready', () ->
@@ -70,6 +72,11 @@ Opifex = (Url,Module,Args...) ->
 		else
 			self.connection.exchange route, { durable: false, type: 'topic', autoDelete: true }, (Exchange) ->
 				self[route] = Exchange
+				Exchange.on 'close', () ->
+					console.log "[EXCHANGE] got exchange close for #{exchange}"
+					self.exchanges[exchange] = null
+				Exchange.on 'error', (error) ->
+					console.log "[EXCHANGE] got exchange error for #{exchange} with #{error}"
 				Exchange?.publish(recipient,msg,{ headers: self.headers || {} })
 	self
 
