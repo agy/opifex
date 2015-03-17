@@ -42,6 +42,7 @@ Opifex = (Url,Module,Args...) ->
 		(require "opifex.#{Module}").apply(self,Args)
 			
 	self.exchanges = {}
+	self.queues = {}
 	self.connection = amqp.createConnection
 		host: host,
 		port: port*1,
@@ -51,33 +52,47 @@ Opifex = (Url,Module,Args...) ->
 		heartbeat: 10
 	self.connection.on 'error', (Message) ->
 		console.log "Connection error", Message
+		process.exit 1
 	self.connection.on 'close', () ->
 		console.log "[OPIFEX] GOT CONNECTION CLOSE"
+		process.exit 0
 	self.connection.on 'end', () ->
 		console.log "Connection closed"
+		process.exit 0
 	self.connection.on 'ready', () ->
 		self.connection.exchange exchange, { durable: false, type: 'topic', autoDelete: true }, (Exchange) ->
-			self.exchange = Exchange
+			self.exchanges[exchange] = Exchange
+			Exchange.on 'close', () ->
+				console.log "[EXCHANGE] got exchange close for #{route}"
+				process.exit 0
+			Exchange.on 'error', (error) ->
+				console.log "[EXCHANGE] got exchange error for #{route} with #{error}"
 			self.connection.queue queue,{ arguments: { "x-message-ttl" : 60000 } }, (Queue) ->
-				self.queue = Queue
-				self.queue.bind exchange, key
-				(self.queue.subscribe self).addCallback (ok) ->
+				self.queues[queue] = Queue
+				Queue.on 'close', () ->
+					console.log "[QUEUE] got queue close for source #{queue}"
+					process.exit 0
+				Queue.on 'error', (error) ->
+					console.log "[QUEUE] got queue error for source #{queue} with #{error}"
+					process.exit 1
+				Queue.bind exchange, key
+				(Queue.subscribe self).addCallback (ok) ->
 					self['init']?.apply(self,[])
-	self.send = (msg,route,recipient) -># route & recipient are optional, default to destination exchange and key respectively
-		route ?= dest
-		recipient ?= path
-		if !msg then return
-		if self[route]
-			self[route].publish(recipient,msg, { headers: self.headers || {} })
-		else
-			self.connection.exchange route, { durable: false, type: 'topic', autoDelete: true }, (Exchange) ->
-				self[route] = Exchange
-				Exchange.on 'close', () ->
-					console.log "[EXCHANGE] got exchange close for #{exchange}"
-					self.exchanges[exchange] = null
-				Exchange.on 'error', (error) ->
-					console.log "[EXCHANGE] got exchange error for #{exchange} with #{error}"
-				Exchange?.publish(recipient,msg,{ headers: self.headers || {} })
+		self.send = (msg,route,recipient) -># route & recipient are optional, default to destination exchange and key respectively
+			route ?= dest
+			recipient ?= path
+			if !msg then return
+			if self.exchanges[route]
+				self.exchanges[route].publish(recipient,msg, { headers: self.headers || {} })
+			else
+				self.connection.exchange route, { durable: false, type: 'topic', autoDelete: true }, (Exchange) ->
+					self.exchanges[route] = Exchange
+					Exchange.on 'close', () ->
+						console.log "[EXCHANGE] got exchange close for #{route}"
+						self.exchanges[route] = null
+					Exchange.on 'error', (error) ->
+						console.log "[EXCHANGE] got exchange error for #{route} with #{error}"
+					Exchange?.publish(recipient,msg,{ headers: self.headers || {} })
 	self
 
 module.exports = Opifex
