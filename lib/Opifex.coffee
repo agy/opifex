@@ -77,6 +77,7 @@ Opifex = (Url,Module,Args...) ->
 					process.exit 1
 				Queue.bind exchange, key
 				(Queue.subscribe self).addCallback (ok) ->
+					self.sourceKey = key
 					self['init']?.apply(self,[])
 		self.send = (msg,route,recipient) -># route & recipient are optional, default to destination exchange and key respectively
 			route ?= dest
