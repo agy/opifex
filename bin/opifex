@@ -5,5 +5,5 @@ Opifex = require 'opifex'
 [ amqp, module, args... ] = process.argv[2...]
 amqp ||= process.env['AMQP']
 module ||= process.env['MODULE']
-args ||= (process.env['ARGS'] || "").split(///\s+///) 
+args = process.env['ARGS'].split(///\s+///) if not args.length and process.env['ARGS']
 Opifex.apply(Opifex,[ amqp, module, args ])
