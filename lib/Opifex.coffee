@@ -41,6 +41,15 @@ Opifex = (Url,Module,Args...) ->
 	else
 		(require "opifex.#{Module}").apply(self,Args)
 			
+	self.bindings =
+		source:
+			exchange: exchange
+			key: key
+			queue: queue
+		sink:
+			exchange: dest
+			key: path
+		domain: domain
 	self.exchanges = {}
 	self.queues = {}
 	self.connection = amqp.createConnection
