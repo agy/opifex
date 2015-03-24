@@ -12,7 +12,7 @@ Opifex = (Url,Module,Args...) ->
 	path ||= key # for publish only, NB: you can not send to # or * routes
 	self = (message, headers, info)  ->
 		$ = arguments.callee
-		try 
+		try
 			[ method, args... ] = JSON.parse message.data.toString()
 		catch e
 			console.log "not json #{message.data}"
@@ -36,11 +36,6 @@ Opifex = (Url,Module,Args...) ->
 		else
 			$[method]?.apply $, args
 
-	if typeof(Module) == 'function'
-		Module.apply(self,Args)
-	else
-		(require "opifex.#{Module}").apply(self,Args)
-			
 	self.bindings =
 		source:
 			exchange: exchange
@@ -50,6 +45,12 @@ Opifex = (Url,Module,Args...) ->
 			exchange: dest
 			key: path
 		domain: domain
+
+	if typeof(Module) == 'function'
+		Module.apply(self,Args)
+	else
+		(require "opifex.#{Module}").apply(self,Args)
+
 	self.exchanges = {}
 	self.queues = {}
 	self.connection = amqp.createConnection
