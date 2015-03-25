@@ -73,10 +73,10 @@ Opifex = (Url,Module,Args...) ->
 		self.connection.exchange exchange, { durable: false, type: 'topic', autoDelete: true }, (Exchange) ->
 			self.exchanges[exchange] = Exchange
 			Exchange.on 'close', () ->
-				console.log "[EXCHANGE] got exchange close for #{route}"
+				console.log "[EXCHANGE] got exchange close for #{exchange}"
 				process.exit 0
 			Exchange.on 'error', (error) ->
-				console.log "[EXCHANGE] got exchange error for #{route} with #{error}"
+				console.log "[EXCHANGE] got exchange error for #{exchange} with #{error}"
 			self.connection.queue queue,{ arguments: { "x-message-ttl" : 60000 } }, (Queue) ->
 				self.queues[queue] = Queue
 				Queue.on 'close', () ->
