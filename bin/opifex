@@ -2,8 +2,10 @@
 #
 
 Opifex = require 'opifex'
-[ amqp, module, args... ] = process.argv[2...]
+[ amqp, source, sink, module, args... ] = process.argv[2...]
 amqp ||= process.env['AMQP']
 module ||= process.env['MODULE']
+source ||= process.env['SOURCE']
+sink ||= process.env['SINK']
 args = process.env['ARGS'].split(///\s+///) if not args.length and process.env['ARGS']
-Opifex.apply(Opifex,[ amqp, module, args ])
+Opifex.apply(Opifex,[ amqp, source, sink, module, args ])
