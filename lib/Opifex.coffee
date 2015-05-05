@@ -2,7 +2,7 @@
 #
 #	© 2013 Dave Goehrig <dave@dloh.org>
 #
-Amqp = require('amqplib/event_api').AMQP
+Amqp = require('wot-amqplib/event_api').AMQP
 
 Opifex = (Url,Source,Sink,Module,Args...) ->
 
