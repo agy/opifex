@@ -61,6 +61,10 @@ Opifex = (Url,Source,Sink,Module,Args...) ->
 		input = connection.createChannel()
 		console.log "created input"
 
+		[ SourceExchange, SourceQueue, SourceKey ] = Source.split '/'
+		SourceQueue ||= SourceExchange
+		SourceKey ||= '#'
+
 		# input error
 		input.on 'error', (e) ->
 			console.log "[opifex] input error #{e}"
@@ -68,18 +72,18 @@ Opifex = (Url,Source,Sink,Module,Args...) ->
 		# once the channel is opened, we declare the input queue
 		input.on 'channel_opened', () ->
 			console.log "input opened"
-			input.declareQueue Source, {}
+			input.declareQueue SourceQueue, {}
 
 		# once we have the queue declared, we will start the subscription
 		input.on 'queue_declared', (m,queue) ->
 			console.log "input queue declared"
-			input.declareExchange Source, 'topic', {}
+			input.declareExchange SourceExchange, 'topic', {}
 
 		# exchange declared
 		input.on 'exchange_declared', (m,exchange) ->
 			console.log "input exchange declared #{exchange}"
-			if exchange == Source
-				input.bindQueue Source, Source, '#', {}		
+			if exchange == SourceExchange
+				input.bindQueue SourceQueue, SourceExchange, SourceKey, {}
 		
 		# once we're bound, setup consumption
 		input.on 'queue_bound', (m, a) ->
@@ -100,7 +104,7 @@ Opifex = (Url,Source,Sink,Module,Args...) ->
 		output = connection.createChannel()
 		console.log "output created"
 
-		[ Exchange, Key ] = Sink.split '/'
+		[ SinkExchange, SinkKey ] = Sink.split '/'
 
 		output.on 'error', (e) ->
 			console.log "[opifex] output error #{e}"
@@ -108,24 +112,24 @@ Opifex = (Url,Source,Sink,Module,Args...) ->
 		# by declaring our exchange we're assured that it will exist before we send
 		output.on 'channel_opened', () ->
 			console.log "output opened"
-			output.declareExchange Exchange, 'topic', {}
+			output.declareExchange SinkExchange, 'topic', {}
 		
 		# Our opifex has a fixed route out.
 		output.on 'exchange_declared', (m, exchange) ->
 			console.log "output exchange declared #{exchange}"
-			if exchange == Exchange
+			if exchange == SinkExchange
 				output.declareQueue exchange, {}
 
 		output.on 'queue_declared', (m,queue) ->
-			console.log "output queue declared"
-			output.bindQueue queue,Exchange,'#', {}
+			console.log "output queue declared #{queue}"
+			output.bindQueue queue,SinkExchange,'#', {}
 
 		output.on 'queue_bound', (m,a) ->
 			console.log "output queue bound"
 			# once our exchange is declared we can expose the send interface
 			self.send = (msg) ->
-				console.log "sending message #{Exchange} #{Key} #{msg}"
-				output.publish Exchange, Key, new Buffer(msg), {}
+				console.log "sending message #{SinkExchange} #{SinkKey} #{msg}"
+				output.publish SinkExchange, SinkKey, new Buffer(msg), {}
 
 		# until that happens just blackhole requests
 		self.send = () ->
