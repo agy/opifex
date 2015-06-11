@@ -23,33 +23,44 @@ Opifex = (Url,Source,Sink,Module,Args...) ->
 	self = (message, headers)  ->
 		console.log("got",message,headers)
 		$ = arguments.callee
-		try
-			# try to parse as JSON
-			json = JSON.parse message.toString()
-		catch e
-			# ok it isn't a JSON, dispatch as binary
-			try 	
-				$["*"]?.apply $, [ message ] if message
-			catch e
-				console.log "[opifex] failed to dispatch as binary: #{e}"
-			return
 
-		try
-			# check to see if it is an s-exp
-			[ method, args... ] = json
-		catch e
-			# it isn't an s-exp so pass it to our wildcard handler
+		return if not message
+
+		# Raw mode. Try to dispatch to '*' with no examination or manipulation of message.
+		if process.env['FORCE_RAW_MESSAGES']
+			if $["*"]?
+				$["*"].apply $, [ message ]
+			else
+				console.log '[opifex] could not dispatch raw to "*"'
+
+		else
+			# Try to interpret message as JSON. If it isn't, try to dispatch to '*'.
 			try
-				$["*"]?.apply $, [ json ]
+				json = JSON.parse message.toString()
 			catch e
-				console.log "[opifex] failed to dispatch as json: #{e}"
-			return
-	
-		try
-			# we're a JSON s-exp, dispatch method	
-			$[method]?.apply $, args
-		catch e
-			console.log "[opifex] failed to dispatch as s-exp: #{e}"
+				if $["*"]?
+					$["*"].apply $, [ message ]
+				else
+					console.log '[opifex] could not dispatch binary to "*"'
+				return
+
+			# If message is an array, try to interpret as s-exp.
+			# In checking to see if the first element is a method, try to avoid accidental matches.
+			# If no matching method is found, try to dispatch to '*'.
+			if json instanceof Array
+				if json.length > 0 and $.hasOwnProperty(json[0]) and $[json[0]] instanceof Function
+					method = json.shift()
+					$[method].apply $, json
+				else if $["*"]?
+					$["*"].apply $, json
+				else
+					console.log '[opifex] could not dispatch #{json}'
+
+			# Not an array, so no method matching. Try to dispatch to '*'.
+			else if $["*"]?
+				$["*"].apply $, [ json ]
+			else
+				console.log '[opifex] could not dispatch #{json}'
 
 	# Once we're connected we'll initialize the input and output channels
 	input = {}
