@@ -1,6 +1,6 @@
 {
   "name": "opifex",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "dependencies": {
     "wot-amqplib": {
       "version": "0.3.1",
