@@ -1,40 +1,46 @@
 {
-  "name": "amqplib",
-  "version": "0.3.1",
+  "name": "opifex",
+  "version": "1.0.0",
   "dependencies": {
-    "bitsyntax": {
-      "version": "0.0.4",
-      "from": "bitsyntax@>=0.0.4 <0.1.0"
-    },
-    "buffer-more-ints": {
-      "version": "0.0.2",
-      "from": "buffer-more-ints@0.0.2"
-    },
-    "readable-stream": {
-      "version": "1.1.13",
-      "from": "readable-stream@>=1.0.0 <2.0.0 >=1.1.9",
+    "wot-amqplib": {
+      "version": "0.3.1",
+      "from": "wot-amqplib@0.3.1",
       "dependencies": {
-        "core-util-is": {
-          "version": "1.0.1",
-          "from": "core-util-is@>=1.0.0 <1.1.0"
+        "bitsyntax": {
+          "version": "0.0.4",
+          "from": "bitsyntax@0.0.4"
         },
-        "isarray": {
-          "version": "0.0.1",
-          "from": "isarray@0.0.1"
+        "buffer-more-ints": {
+          "version": "0.0.2",
+          "from": "buffer-more-ints@0.0.2"
         },
-        "string_decoder": {
-          "version": "0.10.31",
-          "from": "string_decoder@>=0.10.0 <0.11.0"
+        "readable-stream": {
+          "version": "1.1.13",
+          "from": "readable-stream@1.1.13",
+          "dependencies": {
+            "core-util-is": {
+              "version": "1.0.1",
+              "from": "core-util-is@1.0.1"
+            },
+            "isarray": {
+              "version": "0.0.1",
+              "from": "isarray@0.0.1"
+            },
+            "string_decoder": {
+              "version": "0.10.31",
+              "from": "string_decoder@0.10.31"
+            },
+            "inherits": {
+              "version": "2.0.1",
+              "from": "inherits@2.0.1"
+            }
+          }
         },
-        "inherits": {
-          "version": "2.0.1",
-          "from": "inherits@>=2.0.1 <2.1.0"
+        "when": {
+          "version": "3.6.4",
+          "from": "when@3.6.4"
         }
       }
-    },
-    "when": {
-      "version": "3.6.4",
-      "from": "when@>=3.6.2 <3.7.0"
     }
   }
 }
