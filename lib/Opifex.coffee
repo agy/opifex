@@ -142,18 +142,18 @@ Opifex = (Url,Source,Sink,Module,Args...) ->
 				console.log "sending message #{SinkExchange} #{SinkKey} #{msg}"
 				output.publish SinkExchange, SinkKey, new Buffer(msg), {}
 
+				# Finally mix in the behaviors either by method or module
+				if typeof(Module) == 'function'
+					Module.apply(self,Args)
+				else
+					(require "opifex.#{Module}").apply(self,Args)
+
 		# until that happens just blackhole requests
 		self.send = () ->
 			console.log "[opifex] error send called before exchange initialized"
 
 		# now we open our channel
 		output.open()
-
-		# Finally mix in the behaviors either by method or module
-		if typeof(Module) == 'function'
-			Module.apply(self,Args)
-		else
-			(require "opifex.#{Module}").apply(self,Args)
 
 	self
 
